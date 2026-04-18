@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     const encodedRegion = encodeURIComponent(regionString);
-    const naverLandUrl = `https://m.land.naver.com/search/result/${encodedRegion}`;
+    const naverLandUrl = `https://new.land.naver.com/search?query=${encodedRegion}`;
     window.open(naverLandUrl, '_blank');
   }
 
