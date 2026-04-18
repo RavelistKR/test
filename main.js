@@ -10,11 +10,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const listingsBody = document.getElementById('listings-body');
   const resultsCount = document.getElementById('results-count');
 
-  // 프록시 설정 (가장 안정적인 corsproxy.io 사용)
-  const PROXY_URL = 'https://corsproxy.io/?';
+  // 프록시 목록 (순차적으로 시도)
+  const PROXY_LIST = [
+    (url) => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+    (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    (url) => `https://thingproxy.freeboard.io/fetch/${url}`
+  ];
+
   const BASE_API_URL = 'https://new.land.naver.com/api';
 
-  // 시/도 리스트 하드코딩 (API 장애 대비 및 초기 로딩 속도 향상)
   const SIDO_LIST = [
     { code: '1100000000', name: '서울특별시' },
     { code: '4100000000', name: '경기도' },
@@ -48,20 +52,34 @@ document.addEventListener('DOMContentLoaded', () => {
     themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
   });
 
-  // API 호출 함수
+  // 통합 API 호출 함수 (폴백 로직 포함)
   async function apiFetch(url) {
-    try {
-      const targetUrl = `${PROXY_URL}${encodeURIComponent(url)}`;
-      const response = await fetch(targetUrl);
-      if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-      return await response.json();
-    } catch (error) {
-      console.error('API Fetch Error:', error);
-      return null;
+    for (const getProxyUrl of PROXY_LIST) {
+      try {
+        const proxyUrl = getProxyUrl(url);
+        console.log('Trying proxy:', proxyUrl);
+        const response = await fetch(proxyUrl);
+        if (!response.ok) continue;
+
+        const data = await response.json();
+        
+        // AllOrigins 특수 처리
+        if (data.contents) {
+          try {
+            return JSON.parse(data.contents);
+          } catch {
+            return data.contents;
+          }
+        }
+        return data;
+      } catch (err) {
+        console.warn('Proxy failed, trying next...', err);
+        continue;
+      }
     }
+    return null;
   }
 
-  // 초기 시/도 설정
   function initSido() {
     sidoSelect.innerHTML = '<option value="">시/도를 선택하세요</option>';
     SIDO_LIST.forEach(sido => {
@@ -72,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 구/군 정보 가져오기
   sidoSelect.addEventListener('change', async () => {
     const sidoCode = sidoSelect.value;
     gunguSelect.innerHTML = '<option value="">불러오는 중...</option>';
@@ -84,8 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const url = `${BASE_API_URL}/regions/list?cortarNo=${sidoCode}`;
       const data = await apiFetch(url);
       
-      gunguSelect.innerHTML = '<option value="">구/군을 선택하세요</option>';
       if (data && data.regionList) {
+        gunguSelect.innerHTML = '<option value="">구/군을 선택하세요</option>';
         data.regionList.forEach(gungu => {
           const option = document.createElement('option');
           option.value = gungu.cortarNo;
@@ -94,12 +111,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         gunguSelect.disabled = false;
       } else {
-        alert('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+        gunguSelect.innerHTML = '<option value="">연결 실패 (다시 시도)</option>';
+        alert('데이터 연결이 원활하지 않습니다. 다시 한번 시도해 주세요.');
       }
     }
   });
 
-  // 동 정보 가져오기
   gunguSelect.addEventListener('change', async () => {
     const gunguCode = gunguSelect.value;
     dongSelect.innerHTML = '<option value="">불러오는 중...</option>';
@@ -109,8 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const url = `${BASE_API_URL}/regions/list?cortarNo=${gunguCode}`;
       const data = await apiFetch(url);
       
-      dongSelect.innerHTML = '<option value="">동을 선택하세요</option>';
       if (data && data.regionList) {
+        dongSelect.innerHTML = '<option value="">동을 선택하세요</option>';
         data.regionList.forEach(dong => {
           const option = document.createElement('option');
           option.value = dong.cortarNo;
@@ -122,29 +139,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 매물 데이터 가져오기
   async function fetchListings(cortarNo) {
     const url = `${BASE_API_URL}/articles/list?cortarNo=${cortarNo}&rletTypeCd=APT:OPST:VL:OR:JW&tradeTypeCd=A1:B1:B2&sort=rank&page=1`;
     const data = await apiFetch(url);
     return data && data.articleList ? data.articleList : [];
   }
 
-  // 가격 포맷팅
   function formatPrice(prc, rentPrc) {
     if (!prc) return '-';
-    if (rentPrc && rentPrc !== "0" && rentPrc !== 0) {
-      return `${prc}/${rentPrc}`;
-    }
+    if (rentPrc && rentPrc !== "0" && rentPrc !== 0) return `${prc}/${rentPrc}`;
     return prc;
   }
 
-  // 테이블 렌더링
   function renderListings(listings) {
     listingsBody.innerHTML = '';
     resultsCount.textContent = `${listings.length}건`;
 
     if (listings.length === 0) {
-      listingsBody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 2rem;">매물을 불러오지 못했거나 현재 광고 중인 매물이 없습니다.</td></tr>';
+      listingsBody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 2rem;">데이터를 불러오지 못했습니다. 잠시 후 다시 조회를 눌러주세요.</td></tr>';
       return;
     }
 
@@ -168,12 +180,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 검색 버튼 클릭
   searchBtn.addEventListener('click', async () => {
     const targetCode = dongSelect.value || gunguSelect.value || sidoSelect.value;
-    
     if (!targetCode || targetCode === sidoSelect.options[0].value) {
-      alert('지역을 끝까지 선택해 주세요.');
+      alert('지역을 선택해 주세요.');
       return;
     }
 
