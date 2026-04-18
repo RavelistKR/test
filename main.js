@@ -19,14 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
     themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
   });
 
-  // 네이버 부동산 딥링크 생성 함수 (가장 정확한 구형 통합검색 엔드포인트 사용)
   function generateNaverLink(query, typeLabel, tradeLabel) {
-    // query: "역삼동", typeLabel: "아파트", tradeLabel: "매매"
-    // 네이버 부동산 구형 검색 엔진은 자연어를 처리하여 신형 지도로 리다이렉트해주는 능력이 가장 탁월합니다.
     const fullSearchQuery = `${query} ${typeLabel} ${tradeLabel}`;
     const encodedQuery = encodeURIComponent(fullSearchQuery);
-    
-    // 이 URL은 네이버가 좌표(ms)를 자동으로 계산하여 신형 지도로 정확하게 넘겨줍니다.
     return `https://land.naver.com/search/search.naver?query=${encodedQuery}`;
   }
 
@@ -36,34 +31,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loading.style.display = 'block';
     analysisResults.style.display = 'none';
+    
+    // 이전 애니메이션 클래스 제거
+    const cards = document.querySelectorAll('.analysis-card');
+    cards.forEach(card => card.classList.remove('show'));
 
-    // 분석 시뮬레이션 (0.5초)
+    // 분석 시뮬레이션 (조금 더 리얼한 느낌을 위해 0.6초)
     setTimeout(() => {
       // 지역 배지 업데이트
       document.getElementById('res-region-1').textContent = query;
       document.getElementById('res-region-2').textContent = query;
       document.getElementById('res-region-3').textContent = query;
 
-      // 링크 업데이트 (가장 확실한 리다이렉트 경로 적용)
-      // 아파트
+      // 링크 업데이트
       document.getElementById('apt-buy').href = generateNaverLink(query, '아파트', '매매');
       document.getElementById('apt-rent').href = generateNaverLink(query, '아파트', '전세');
       document.getElementById('apt-monthly').href = generateNaverLink(query, '아파트', '월세');
 
-      // 오피스텔
       document.getElementById('opst-buy').href = generateNaverLink(query, '오피스텔', '매매');
       document.getElementById('opst-rent').href = generateNaverLink(query, '오피스텔', '전세');
       document.getElementById('opst-monthly').href = generateNaverLink(query, '오피스텔', '월세');
 
-      // 빌라/주택
       document.getElementById('vl-buy').href = generateNaverLink(query, '빌라', '매매');
       document.getElementById('vl-rent').href = generateNaverLink(query, '빌라', '전세');
       document.getElementById('vl-monthly').href = generateNaverLink(query, '빌라', '월세');
 
       loading.style.display = 'none';
       analysisResults.style.display = 'grid';
+      
+      // 순차적으로 카드 나타나게 하기
+      cards.forEach((card, index) => {
+        setTimeout(() => {
+          card.classList.add('show');
+        }, index * 150);
+      });
+
       analysisResults.scrollIntoView({ behavior: 'smooth' });
-    }, 500);
+    }, 600);
   }
 
   searchBtn.addEventListener('click', () => performAnalysis(regionInput.value));
