@@ -195,6 +195,28 @@ h1 {
   transform: scale(0.97);
 }
 
+.buy-btn {
+  display: inline-block;
+  margin-top: 1rem;
+  background-color: #ff9f43;
+  color: white;
+  text-decoration: none;
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 12px;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-left: 10px;
+}
+
+.buy-btn:hover {
+  background-color: #ee5253;
+}
+
+.buy-btn:active {
+  transform: scale(0.97);
+}
+
 /* Info Section */
 .info-section {
   text-align: left;
