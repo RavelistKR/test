@@ -19,15 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
     themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
   });
 
-  // 네이버 부동산 딥링크 생성 함수 (자연어 통합 검색 방식)
+  // 네이버 부동산 딥링크 생성 함수 (가장 정확한 구형 통합검색 엔드포인트 사용)
   function generateNaverLink(query, typeLabel, tradeLabel) {
     // query: "역삼동", typeLabel: "아파트", tradeLabel: "매매"
-    // 네이버 검색 엔진이 가장 정확하게 인식하는 '지역 + 유형 + 거래' 조합 생성
-    const fullQuery = `${query} ${typeLabel} ${tradeLabel}`;
-    const encodedQuery = encodeURIComponent(fullQuery);
+    // 네이버 부동산 구형 검색 엔진은 자연어를 처리하여 신형 지도로 리다이렉트해주는 능력이 가장 탁월합니다.
+    const fullSearchQuery = `${query} ${typeLabel} ${tradeLabel}`;
+    const encodedQuery = encodeURIComponent(fullSearchQuery);
     
-    // search?query 방식은 자연어를 입력했을 때 가장 정확하게 해당 위치로 이동합니다.
-    return `https://new.land.naver.com/search?query=${encodedQuery}`;
+    // 이 URL은 네이버가 좌표(ms)를 자동으로 계산하여 신형 지도로 정확하게 넘겨줍니다.
+    return `https://land.naver.com/search/search.naver?query=${encodedQuery}`;
   }
 
   function performAnalysis(query) {
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('res-region-2').textContent = query;
       document.getElementById('res-region-3').textContent = query;
 
-      // 링크 업데이트 (자연어 명칭 전달)
+      // 링크 업데이트 (가장 확실한 리다이렉트 경로 적용)
       // 아파트
       document.getElementById('apt-buy').href = generateNaverLink(query, '아파트', '매매');
       document.getElementById('apt-rent').href = generateNaverLink(query, '아파트', '전세');
