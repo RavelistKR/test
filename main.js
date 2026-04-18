@@ -19,10 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
     themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
   });
 
-  function generateNaverLink(query, typeLabel, tradeLabel) {
-    const fullSearchQuery = `${query} ${typeLabel} ${tradeLabel}`;
-    const encodedQuery = encodeURIComponent(fullSearchQuery);
-    return `https://land.naver.com/search/search.naver?query=${encodedQuery}`;
+  function buildResultsUrl(query, propertyType, tradeType) {
+    const params = new URLSearchParams({
+      query,
+      propertyType,
+      tradeType,
+    });
+
+    return `/results.html?${params.toString()}`;
   }
 
   function performAnalysis(query) {
@@ -38,17 +42,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Urban 스타일의 절제된 애니메이션을 위해 0.7초 대기
     setTimeout(() => {
       // 링크 업데이트
-      document.getElementById('apt-buy').href = generateNaverLink(query, '아파트', '매매');
-      document.getElementById('apt-rent').href = generateNaverLink(query, '아파트', '전세');
-      document.getElementById('apt-monthly').href = generateNaverLink(query, '아파트', '월세');
+      document.getElementById('apt-buy').href = buildResultsUrl(query, 'apartment', 'sale');
+      document.getElementById('apt-rent').href = buildResultsUrl(query, 'apartment', 'lease');
+      document.getElementById('apt-monthly').href = buildResultsUrl(query, 'apartment', 'rent');
 
-      document.getElementById('opst-buy').href = generateNaverLink(query, '오피스텔', '매매');
-      document.getElementById('opst-rent').href = generateNaverLink(query, '오피스텔', '전세');
-      document.getElementById('opst-monthly').href = generateNaverLink(query, '오피스텔', '월세');
+      document.getElementById('opst-buy').href = buildResultsUrl(query, 'officetel', 'sale');
+      document.getElementById('opst-rent').href = buildResultsUrl(query, 'officetel', 'lease');
+      document.getElementById('opst-monthly').href = buildResultsUrl(query, 'officetel', 'rent');
 
-      document.getElementById('vl-buy').href = generateNaverLink(query, '빌라', '매매');
-      document.getElementById('vl-rent').href = generateNaverLink(query, '빌라', '전세');
-      document.getElementById('vl-monthly').href = generateNaverLink(query, '빌라', '월세');
+      document.getElementById('vl-buy').href = buildResultsUrl(query, 'villa', 'sale');
+      document.getElementById('vl-rent').href = buildResultsUrl(query, 'villa', 'lease');
+      document.getElementById('vl-monthly').href = buildResultsUrl(query, 'villa', 'rent');
 
       loading.style.display = 'none';
       analysisResults.style.display = 'grid';
