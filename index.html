@@ -3,23 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ravelist 부동산 - 실시간 매물 데이터 분석기</title>
-  <meta name="description" content="네이버 부동산 매물을 실시간으로 분석하여 가격, 평형, 층 정보를 표로 정리해 드립니다.">
+  <title>Ravelist 부동산 - 네이버 부동산 매물 퀵 분석기</title>
+  <meta name="description" content="지역만 입력하면 아파트, 오피스텔, 빌라 매물을 유형별로 즉시 찾아드립니다. 네이버 부동산 다이렉트 분석 도구.">
   <link href='/style.css' rel='stylesheet'>
   <style>
-    /* 추가적인 스타일 보정 */
-    .search-hint { font-size: 0.8rem; color: var(--placeholder-text); margin-top: 5px; }
-    .status-msg { margin: 10px 0; font-weight: 600; }
-    .status-error { color: #e74c3c; }
-    .status-success { color: #27ae60; }
-    .direct-link-box { 
-      background: var(--accent-color); 
-      padding: 1.5rem; 
-      border-radius: 12px; 
-      margin-top: 2rem; 
-      display: none;
-      border: 2px dashed var(--btn-bg);
+    .search-container { max-width: 700px; margin: 0 auto 3rem; text-align: center; }
+    .analysis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; display: none; }
+    .analysis-card { 
+      background: var(--container-bg); 
+      border-radius: 20px; 
+      padding: 2rem; 
+      box-shadow: 0 10px 25px var(--shadow);
+      border: 1px solid var(--input-border);
+      transition: transform 0.3s;
+      text-align: left;
     }
+    .analysis-card:hover { transform: translateY(-5px); }
+    .card-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem; color: var(--btn-bg); display: flex; align-items: center; gap: 8px; }
+    .card-desc { font-size: 0.9rem; color: var(--placeholder-text); margin-bottom: 1.5rem; }
+    .action-group { display: flex; flex-direction: column; gap: 10px; }
+    .btn-action { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      padding: 12px 18px; 
+      border-radius: 10px; 
+      text-decoration: none; 
+      font-weight: 700; 
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+    .btn-buy { background: #fee2e2; color: #dc2626; }
+    .btn-rent { background: #dcfce7; color: #16a34a; }
+    .btn-monthly { background: #fef9c3; color: #ca8a04; }
+    .btn-action:hover { opacity: 0.8; transform: translateX(5px); }
+    .region-badge { background: var(--btn-bg); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 10px; display: inline-block; }
   </style>
 </head>
 <body>
@@ -34,58 +52,63 @@
       <button id="theme-btn" aria-label="Toggle theme">🌙</button>
     </div>
 
-    <section id="search-section">
-      <h1>네이버 부동산 매물 분석기</h1>
-      <p class="subtitle">원하는 지역(동, 구)을 입력하면 실시간 매물을 표로 정리합니다.</p>
+    <section id="search-section" class="search-container">
+      <h1>네이버 부동산 매물 퀵 분석</h1>
+      <p class="subtitle">지역명만 입력하세요. 원하는 유형의 매물을 즉시 분석해 드립니다.</p>
       
       <div class="search-card">
         <div class="search-input-group">
           <input type="text" id="region-input" placeholder="예: 역삼동, 반포동, 분당구 등" autofocus>
-          <button id="search-btn">데이터 분석 시작</button>
+          <button id="search-btn">매물 분석 시작</button>
         </div>
-        <p class="search-hint">※ 동 이름(예: '역삼동') 또는 구 이름(예: '강남구')을 입력하세요.</p>
         <div class="quick-links">
           <button class="quick-btn" data-query="역삼동">역삼동</button>
           <button class="quick-btn" data-query="반포동">반포동</button>
-          <button class="quick-btn" data-query="판교동">판교동</button>
-          <button class="quick-btn" data-query="해운대">해운대</button>
           <button class="quick-btn" data-query="성수동">성수동</button>
+          <button class="quick-btn" data-query="판교">판교</button>
         </div>
       </div>
-      
-      <div id="loading" class="loading-overlay" style="display: none;">
-        <div class="spinner"></div>
-        <div id="status-text" class="status-msg">지역 코드를 확인 중...</div>
+    </section>
+
+    <div id="loading" class="loading-overlay" style="display: none;">
+      <div class="spinner"></div>
+      <p>해당 지역의 최신 매물 데이터를 매칭 중입니다...</p>
+    </div>
+
+    <section id="analysis-results" class="analysis-grid">
+      <!-- 아파트 분석 카드 -->
+      <div class="analysis-card">
+        <span class="region-badge" id="res-region-1">지역</span>
+        <div class="card-title">🏢 아파트 분석</div>
+        <p class="card-desc">해당 지역의 주요 아파트 단지 및 대단지 매물을 실시간으로 확인합니다.</p>
+        <div class="action-group">
+          <a href="#" target="_blank" class="btn-action btn-buy" id="apt-buy">매매 리스트 보기 <span>→</span></a>
+          <a href="#" target="_blank" class="btn-action btn-rent" id="apt-rent">전세 리스트 보기 <span>→</span></a>
+          <a href="#" target="_blank" class="btn-action btn-monthly" id="apt-monthly">월세 리스트 보기 <span>→</span></a>
+        </div>
       </div>
 
-      <div id="results-container" class="results-container" style="display: none;">
-        <div class="results-header">
-          <h2 id="results-title">실시간 매물 리스트</h2>
-          <span id="results-count" class="badge">0건</span>
+      <!-- 오피스텔 분석 카드 -->
+      <div class="analysis-card">
+        <span class="region-badge" id="res-region-2">지역</span>
+        <div class="card-title">🏨 오피스텔/원룸</div>
+        <p class="card-desc">직장인 및 1인 가구를 위한 역세권 오피스텔과 원룸 매물을 분석합니다.</p>
+        <div class="action-group">
+          <a href="#" target="_blank" class="btn-action btn-buy" id="opst-buy">매매 리스트 보기 <span>→</span></a>
+          <a href="#" target="_blank" class="btn-action btn-rent" id="opst-rent">전세 리스트 보기 <span>→</span></a>
+          <a href="#" target="_blank" class="btn-action btn-monthly" id="opst-monthly">월세 리스트 보기 <span>→</span></a>
         </div>
-        <div class="table-wrapper">
-          <table id="listings-table">
-            <thead>
-              <tr>
-                <th>매물명</th>
-                <th>유형</th>
-                <th>동</th>
-                <th>평형</th>
-                <th>층</th>
-                <th>가격</th>
-                <th>중개사</th>
-                <th>등록일</th>
-                <th>상세</th>
-              </tr>
-            </thead>
-            <tbody id="listings-body"></tbody>
-          </table>
-        </div>
-        
-        <div id="direct-link-box" class="direct-link-box">
-          <p>표 데이터를 불러오는 데 제한이 발생했습니다. (네이버 보안 정책)</p>
-          <p>대신 아래 버튼을 누르면 **해당 지역의 필터링된 결과**를 바로 확인하실 수 있습니다.</p>
-          <a href="#" id="naver-link" target="_blank" class="btn-primary">네이버 부동산에서 결과 보기</a>
+      </div>
+
+      <!-- 빌라/주택 분석 카드 -->
+      <div class="analysis-card">
+        <span class="region-badge" id="res-region-3">지역</span>
+        <div class="card-title">🏡 빌라/주택</div>
+        <p class="card-desc">다세대/다가구 빌라 및 단독주택 매물의 최신 광고 현황을 확인합니다.</p>
+        <div class="action-group">
+          <a href="#" target="_blank" class="btn-action btn-buy" id="vl-buy">매매 리스트 보기 <span>→</span></a>
+          <a href="#" target="_blank" class="btn-action btn-rent" id="vl-rent">전세 리스트 보기 <span>→</span></a>
+          <a href="#" target="_blank" class="btn-action btn-monthly" id="vl-monthly">월세 리스트 보기 <span>→</span></a>
         </div>
       </div>
     </section>
@@ -94,8 +117,8 @@
 
     <section class="info-section">
       <article>
-        <h2>네이버 부동산 실시간 분석 안내</h2>
-        <p>본 서비스는 네이버 부동산에 등록된 현재 매물 정보를 수집하여 가격과 평당 시세를 비교하기 좋게 표 형태로 재구성합니다. 네트워크 환경에 따라 수집 속도가 차이 날 수 있으며, 정보의 정확성을 위해 상세 버튼을 눌러 실제 매물을 확인하시기 바랍니다.</p>
+        <h2>Ravelist 부동산 활용 가이드</h2>
+        <p>네이버 부동산의 보안 강화로 인해 외부 사이트에서의 직접적인 데이터 노출이 제한되고 있습니다. Ravelist는 이러한 환경에서 사용자가 **가장 빠르고 정확하게** 원하는 매물을 찾을 수 있도록, 지역별/유형별 최적화된 분석 링크를 생성하여 제공합니다.</p>
       </article>
     </section>
   </div>
