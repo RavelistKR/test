@@ -311,27 +311,27 @@
       <div class="analysis-card">
         <div class="card-title">APARTMENT</div>
         <div class="action-group">
-          <a href="#" target="_blank" class="btn-action apt-link">Buy (매매) <span>&rarr;</span></a>
-          <a href="#" target="_blank" class="btn-action apt-link">Long-term Rent (전세) <span>&rarr;</span></a>
-          <a href="#" target="_blank" class="btn-action apt-link">Monthly (월세) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="apt-buy">Buy (매매) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="apt-rent">Long-term Rent (전세) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="apt-monthly">Monthly (월세) <span>&rarr;</span></a>
         </div>
       </div>
 
       <div class="analysis-card">
         <div class="card-title">OFFICETEL</div>
         <div class="action-group">
-          <a href="#" target="_blank" class="btn-action opst-link">Buy (매매) <span>&rarr;</span></a>
-          <a href="#" target="_blank" class="btn-action opst-link">Long-term Rent (전세) <span>&rarr;</span></a>
-          <a href="#" target="_blank" class="btn-action opst-link">Monthly (월세) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="opst-buy">Buy (매매) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="opst-rent">Long-term Rent (전세) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="opst-monthly">Monthly (월세) <span>&rarr;</span></a>
         </div>
       </div>
 
       <div class="analysis-card">
         <div class="card-title">VILLA / HOUSE</div>
         <div class="action-group">
-          <a href="#" target="_blank" class="btn-action vl-link">Buy (매매) <span>&rarr;</span></a>
-          <a href="#" target="_blank" class="btn-action vl-link">Long-term Rent (전세) <span>&rarr;</span></a>
-          <a href="#" target="_blank" class="btn-action vl-link">Monthly (월세) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="vl-buy">Buy (매매) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="vl-rent">Long-term Rent (전세) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="vl-monthly">Monthly (월세) <span>&rarr;</span></a>
         </div>
       </div>
     </section>
@@ -341,90 +341,6 @@
     </footer>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // DOM 요소 선택
-      const themeBtn = document.getElementById('theme-btn');
-      const regionInput = document.getElementById('region-input');
-      const searchBtn = document.getElementById('search-btn');
-      const tagBtns = document.querySelectorAll('.tag-btn');
-      const loading = document.getElementById('loading');
-      const resultsSection = document.getElementById('analysis-results');
-      const cards = document.querySelectorAll('.analysis-card');
-
-      // 1. 다크모드 토글 기능
-      themeBtn.addEventListener('click', () => {
-        const isDark = document.body.getAttribute('data-theme') === 'dark';
-        if (isDark) {
-          document.body.removeAttribute('data-theme');
-          themeBtn.textContent = '🌙';
-        } else {
-          document.body.setAttribute('data-theme', 'dark');
-          themeBtn.textContent = '☀️';
-        }
-      });
-
-      // 2. 검색 분석 실행 함수
-      const performAnalysis = (query) => {
-        if (!query || query.trim() === '') {
-          alert('분석할 지역명을 입력해주세요.');
-          regionInput.focus();
-          return;
-        }
-
-        // 기존 결과 숨기기 및 로딩 표시
-        resultsSection.style.display = 'none';
-        cards.forEach(card => card.classList.remove('show'));
-        loading.style.display = 'block';
-
-        // 지역명에 따른 네이버 부동산 검색 URL 동적 생성 (프로토타입용)
-        // 실제 운영시에는 백엔드(Gemini API)에서 리포트를 받아와 화면에 뿌려주는 로직으로 대체됩니다.
-        const encodedQuery = encodeURIComponent(query);
-        const baseNaverUrl = `https://m.land.naver.com/search/result/${encodedQuery}`;
-
-        document.querySelectorAll('.btn-action').forEach(btn => {
-          btn.href = baseNaverUrl; // 임시로 모두 검색결과 메인으로 연결
-        });
-
-        // API 통신을 흉내내는 1.5초 딜레이 (비동기 시뮬레이션)
-        setTimeout(() => {
-          loading.style.display = 'none';
-          resultsSection.style.display = 'grid'; // 그리드 레이아웃 활성화
-
-          // 카드들이 하나씩 스르륵 나타나는 애니메이션 (Stagger 효과)
-          cards.forEach((card, index) => {
-            setTimeout(() => {
-              card.classList.add('show');
-            }, index * 150);
-          });
-          
-          // 스크롤을 결과창으로 부드럽게 이동
-          resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 1500);
-      };
-
-      // 3. 이벤트 리스너 연결
-      // 검색 버튼 클릭 시
-      searchBtn.addEventListener('click', () => {
-        performAnalysis(regionInput.value);
-      });
-
-      // 엔터키 입력 시
-      regionInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          performAnalysis(regionInput.value);
-        }
-      });
-
-      // 해시태그 버튼 클릭 시
-      tagBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const query = e.target.getAttribute('data-query');
-          regionInput.value = query; // 입력창에 텍스트 채우기
-          performAnalysis(query);    // 즉시 검색 실행
-        });
-      });
-    });
-  </script>
+  <script defer src="/main.js"></script>
 </body>
 </html>
