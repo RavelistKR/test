@@ -1,6 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
   const lottoContainer = document.getElementById('lotto-container');
   const generateBtn = document.getElementById('generate-btn');
+  const themeBtn = document.getElementById('theme-btn');
+  const body = document.body;
+
+  // 다크모드 초기 설정
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  body.setAttribute('data-theme', savedTheme);
+  themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+  // 테마 변경 핸들러
+  themeBtn.addEventListener('click', () => {
+    const currentTheme = body.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+  });
 
   function getBallColorClass(num) {
     if (num <= 10) return 'ball-10';
@@ -30,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
       ball.className = `ball ${getBallColorClass(num)}`;
       ball.textContent = num;
       
-      // 애니메이션 효과를 위해 약간의 지연을 둡니다
       ball.style.opacity = '0';
       ball.style.transform = 'translateY(20px)';
       lottoContainer.appendChild(ball);

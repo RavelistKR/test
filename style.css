@@ -1,3 +1,25 @@
+:root {
+  --bg-color: #f0f2f5;
+  --container-bg: white;
+  --text-color: #333;
+  --ball-placeholder-bg: #ddd;
+  --ball-placeholder-text: #999;
+  --shadow: rgba(0,0,0,0.1);
+  --btn-bg: #4a90e2;
+  --btn-hover: #357abd;
+}
+
+[data-theme="dark"] {
+  --bg-color: #1a1a1a;
+  --container-bg: #2d2d2d;
+  --text-color: #f0f0f0;
+  --ball-placeholder-bg: #444;
+  --ball-placeholder-text: #777;
+  --shadow: rgba(0,0,0,0.3);
+  --btn-bg: #357abd;
+  --btn-hover: #4a90e2;
+}
+
 body {
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
   display: flex;
@@ -5,21 +27,50 @@ body {
   align-items: center;
   height: 100vh;
   margin: 0;
-  background-color: #f0f2f5;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .container {
+  position: relative;
   text-align: center;
-  background: white;
+  background: var(--container-bg);
   padding: 2rem;
   border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px var(--shadow);
   width: 90%;
   max-width: 500px;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+#theme-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#theme-btn:hover {
+  background-color: var(--bg-color);
 }
 
 h1 {
-  color: #333;
+  color: var(--text-color);
   margin-bottom: 2rem;
 }
 
@@ -50,19 +101,19 @@ h1 {
 }
 
 .placeholder {
-  background-color: #ddd;
-  color: #999;
+  background-color: var(--ball-placeholder-bg);
+  color: var(--ball-placeholder-text);
 }
 
 /* 로또 공 색상 규격 */
-.ball-10 { background-color: #fbc400; text-shadow: 0 1px 2px rgba(0,0,0,0.2); } /* 1-10: 노랑 */
-.ball-20 { background-color: #69c8f2; text-shadow: 0 1px 2px rgba(0,0,0,0.2); } /* 11-20: 파랑 */
-.ball-30 { background-color: #ff7272; text-shadow: 0 1px 2px rgba(0,0,0,0.2); } /* 21-30: 빨강 */
-.ball-40 { background-color: #aaaaaa; text-shadow: 0 1px 2px rgba(0,0,0,0.2); } /* 31-40: 회색 */
-.ball-45 { background-color: #b0d840; text-shadow: 0 1px 2px rgba(0,0,0,0.2); } /* 41-45: 초록 */
+.ball-10 { background-color: #fbc400; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.ball-20 { background-color: #69c8f2; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.ball-30 { background-color: #ff7272; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.ball-40 { background-color: #aaaaaa; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.ball-45 { background-color: #b0d840; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
 
-button {
-  background-color: #4a90e2;
+#generate-btn {
+  background-color: var(--btn-bg);
   color: white;
   border: none;
   padding: 12px 30px;
@@ -73,10 +124,10 @@ button {
   transition: background-color 0.2s, transform 0.1s;
 }
 
-button:hover {
-  background-color: #357abd;
+#generate-btn:hover {
+  background-color: var(--btn-hover);
 }
 
-button:active {
+#generate-btn:active {
   transform: scale(0.98);
 }
