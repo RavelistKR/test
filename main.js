@@ -19,17 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
     themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
   });
 
-  // 네이버 부동산 딥링크 생성 함수
-  function generateNaverLink(query, type, trade) {
-    // type: APT(아파트), OPST(오피스텔), VL(빌라/주택)
-    // trade: A1(매매), B1(전세), B2(월세)
-    const encodedQuery = encodeURIComponent(query);
-    let baseUrl = `https://new.land.naver.com/search?query=${encodedQuery}`;
+  // 네이버 부동산 딥링크 생성 함수 (자연어 통합 검색 방식)
+  function generateNaverLink(query, typeLabel, tradeLabel) {
+    // query: "역삼동", typeLabel: "아파트", tradeLabel: "매매"
+    // 네이버 검색 엔진이 가장 정확하게 인식하는 '지역 + 유형 + 거래' 조합 생성
+    const fullQuery = `${query} ${typeLabel} ${tradeLabel}`;
+    const encodedQuery = encodeURIComponent(fullQuery);
     
-    // 상세 필터 파라미터 추가
-    // rletTypeCd: 아파트(APT), 오피스텔(OPST), 빌라(VL), 상가(SG) 등
-    // tradeTypeCd: 매매(A1), 전세(B1), 월세(B2)
-    return `${baseUrl}&rletTypeCd=${type}&tradeTypeCd=${trade}`;
+    // search?query 방식은 자연어를 입력했을 때 가장 정확하게 해당 위치로 이동합니다.
+    return `https://new.land.naver.com/search?query=${encodedQuery}`;
   }
 
   function performAnalysis(query) {
@@ -39,33 +37,33 @@ document.addEventListener('DOMContentLoaded', () => {
     loading.style.display = 'block';
     analysisResults.style.display = 'none';
 
-    // 분석 시뮬레이션 (사용자 경험을 위해 0.8초 대기)
+    // 분석 시뮬레이션 (0.5초)
     setTimeout(() => {
       // 지역 배지 업데이트
       document.getElementById('res-region-1').textContent = query;
       document.getElementById('res-region-2').textContent = query;
       document.getElementById('res-region-3').textContent = query;
 
-      // 링크 업데이트
+      // 링크 업데이트 (자연어 명칭 전달)
       // 아파트
-      document.getElementById('apt-buy').href = generateNaverLink(query, 'APT', 'A1');
-      document.getElementById('apt-rent').href = generateNaverLink(query, 'APT', 'B1');
-      document.getElementById('apt-monthly').href = generateNaverLink(query, 'APT', 'B2');
+      document.getElementById('apt-buy').href = generateNaverLink(query, '아파트', '매매');
+      document.getElementById('apt-rent').href = generateNaverLink(query, '아파트', '전세');
+      document.getElementById('apt-monthly').href = generateNaverLink(query, '아파트', '월세');
 
       // 오피스텔
-      document.getElementById('opst-buy').href = generateNaverLink(query, 'OPST', 'A1');
-      document.getElementById('opst-rent').href = generateNaverLink(query, 'OPST', 'B1');
-      document.getElementById('opst-monthly').href = generateNaverLink(query, 'OPST', 'B2');
+      document.getElementById('opst-buy').href = generateNaverLink(query, '오피스텔', '매매');
+      document.getElementById('opst-rent').href = generateNaverLink(query, '오피스텔', '전세');
+      document.getElementById('opst-monthly').href = generateNaverLink(query, '오피스텔', '월세');
 
       // 빌라/주택
-      document.getElementById('vl-buy').href = generateNaverLink(query, 'VL', 'A1');
-      document.getElementById('vl-rent').href = generateNaverLink(query, 'VL', 'B1');
-      document.getElementById('vl-monthly').href = generateNaverLink(query, 'VL', 'B2');
+      document.getElementById('vl-buy').href = generateNaverLink(query, '빌라', '매매');
+      document.getElementById('vl-rent').href = generateNaverLink(query, '빌라', '전세');
+      document.getElementById('vl-monthly').href = generateNaverLink(query, '빌라', '월세');
 
       loading.style.display = 'none';
       analysisResults.style.display = 'grid';
       analysisResults.scrollIntoView({ behavior: 'smooth' });
-    }, 800);
+    }, 500);
   }
 
   searchBtn.addEventListener('click', () => performAnalysis(regionInput.value));
