@@ -32,17 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
     loading.style.display = 'block';
     analysisResults.style.display = 'none';
     
-    // 이전 애니메이션 클래스 제거
     const cards = document.querySelectorAll('.analysis-card');
     cards.forEach(card => card.classList.remove('show'));
 
-    // 분석 시뮬레이션 (조금 더 리얼한 느낌을 위해 0.6초)
+    // Urban 스타일의 절제된 애니메이션을 위해 0.7초 대기
     setTimeout(() => {
-      // 지역 배지 업데이트
-      document.getElementById('res-region-1').textContent = query;
-      document.getElementById('res-region-2').textContent = query;
-      document.getElementById('res-region-3').textContent = query;
-
       // 링크 업데이트
       document.getElementById('apt-buy').href = generateNaverLink(query, '아파트', '매매');
       document.getElementById('apt-rent').href = generateNaverLink(query, '아파트', '전세');
@@ -59,15 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
       loading.style.display = 'none';
       analysisResults.style.display = 'grid';
       
-      // 순차적으로 카드 나타나게 하기
       cards.forEach((card, index) => {
         setTimeout(() => {
           card.classList.add('show');
-        }, index * 150);
+        }, index * 100);
       });
 
       analysisResults.scrollIntoView({ behavior: 'smooth' });
-    }, 600);
+    }, 700);
   }
 
   searchBtn.addEventListener('click', () => performAnalysis(regionInput.value));
@@ -75,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') performAnalysis(regionInput.value);
   });
 
-  document.querySelectorAll('.quick-btn').forEach(btn => {
+  document.querySelectorAll('.tag-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const q = btn.getAttribute('data-query');
       regionInput.value = q;

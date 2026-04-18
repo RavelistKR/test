@@ -3,207 +3,237 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ravelist 부동산 - 프리미엄 매물 퀵 분석</title>
-  <meta name="description" content="지역만 입력하면 아파트, 오피스텔, 빌라 매물을 유형별로 즉시 분석해 드립니다.">
+  <title>Ravelist Real Estate - Urban Analysis</title>
+  <meta name="description" content="도시의 모든 매물을 한눈에. 네이버 부동산 퀵 분석 도구.">
   <link href='/style.css' rel='stylesheet'>
   <style>
-    /* 프리미엄 디자인 보정 */
+    /* Urban Minimalist 스타일 */
     :root {
-      --card-bg: rgba(255, 255, 255, 0.9);
-      --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-      --accent-gradient: linear-gradient(135deg, #1a73e8, #0d47a1);
+      --urban-bg: #f8fafc;
+      --urban-blue: #0f172a;
+      --urban-accent: #3b82f6;
+      --grid-color: rgba(0, 0, 0, 0.03);
     }
 
     [data-theme="dark"] {
-      --card-bg: rgba(45, 45, 45, 0.9);
-      --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      --urban-bg: #020617;
+      --urban-blue: #f8fafc;
+      --urban-accent: #60a5fa;
+      --grid-color: rgba(255, 255, 255, 0.03);
     }
 
-    .main-content { padding-top: 2rem; }
-    
-    h1 { font-size: 2.8rem; letter-spacing: -1.5px; margin-bottom: 1rem; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .subtitle { font-size: 1.2rem; margin-bottom: 3.5rem; opacity: 0.8; }
-
-    /* 검색창 업그레이드 */
-    .search-card { 
-      background: var(--container-bg); 
-      border-radius: 30px; 
-      padding: 3rem; 
-      box-shadow: var(--card-shadow);
-      border: 1px solid rgba(0,0,0,0.05);
+    body {
+      background-color: var(--urban-bg);
+      background-image: radial-gradient(var(--grid-color) 1px, transparent 1px);
+      background-size: 30px 30px; /* 건축 도면 느낌의 그리드 */
     }
 
-    .search-input-group { border-radius: 20px; overflow: hidden; background: var(--bg-color); padding: 5px; border: 2px solid transparent; transition: all 0.3s; }
-    .search-input-group:focus-within { border-color: var(--btn-bg); box-shadow: 0 0 15px rgba(26, 115, 232, 0.2); }
-    .search-input-group input { border: none; background: transparent; padding: 18px 25px; font-size: 1.2rem; }
-    #search-btn { border-radius: 15px; margin: 5px; font-size: 1.1rem; background: var(--accent-gradient); }
-
-    /* 결과 그리드 애니메이션 */
-    .analysis-grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
-      gap: 2rem; 
-      margin-top: 4rem; 
-      display: none; /* JS에서 제어 */
+    .hero-section {
+      padding: 8rem 1.5rem 5rem;
+      text-align: center;
     }
 
-    .analysis-card { 
-      background: var(--card-bg); 
-      backdrop-filter: blur(10px);
-      border-radius: 28px; 
-      padding: 2.5rem; 
-      box-shadow: var(--card-shadow);
-      border: 1px solid rgba(255,255,255,0.1);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    .analysis-card.show { opacity: 1; transform: translateY(0); }
-    .analysis-card:hover { transform: translateY(-10px); box-shadow: 0 30px 60px rgba(0,0,0,0.1); }
-
-    .card-icon { font-size: 2.5rem; margin-bottom: 1.5rem; display: block; }
-    .card-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-color); }
-    .card-desc { font-size: 0.95rem; color: var(--placeholder-text); margin-bottom: 2rem; line-height: 1.5; }
-
-    .region-badge { 
-      background: var(--accent-color); 
-      color: var(--btn-bg); 
-      padding: 6px 16px; 
-      border-radius: 12px; 
-      font-size: 0.85rem; 
-      font-weight: 700;
-      margin-bottom: 15px; 
-      display: inline-block; 
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: var(--urban-blue);
+      letter-spacing: -2px;
+      margin-bottom: 1.5rem;
+      line-height: 1.1;
     }
 
-    /* 프리미엄 버튼 스타일 */
-    .btn-action { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      padding: 16px 22px; 
-      border-radius: 18px; 
-      text-decoration: none; 
-      font-weight: 800; 
+    .subtitle {
+      font-size: 1.25rem;
+      color: var(--placeholder-text);
+      max-width: 600px;
+      margin: 0 auto 4rem;
+      font-weight: 400;
+      letter-spacing: -0.5px;
+    }
+
+    /* 슬림 검색 바 */
+    .urban-search-bar {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--container-bg);
+      border: 1px solid var(--input-border);
+      padding: 10px;
+      border-radius: 100px; /* 완전한 타원형 */
+      display: flex;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s;
+    }
+
+    .urban-search-bar:focus-within {
+      border-color: var(--urban-accent);
+      box-shadow: 0 20px 60px rgba(59, 130, 246, 0.15);
+      transform: scale(1.02);
+    }
+
+    .urban-search-bar input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 15px 30px;
+      font-size: 1.15rem;
+      color: var(--text-color);
+      outline: none;
+    }
+
+    #search-btn {
+      background: var(--urban-blue);
+      color: var(--urban-bg);
+      border: none;
+      padding: 15px 40px;
+      border-radius: 100px;
+      font-weight: 800;
       font-size: 1rem;
-      margin-bottom: 12px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border: 1px solid transparent;
+      cursor: pointer;
+      transition: opacity 0.2s;
     }
-    
-    .btn-buy { background: #fff1f2; color: #e11d48; border-color: #ffe4e6; }
-    .btn-buy:hover { background: #e11d48; color: white; }
-    
-    .btn-rent { background: #f0fdf4; color: #16a34a; border-color: #dcfce7; }
-    .btn-rent:hover { background: #16a34a; color: white; }
-    
-    .btn-monthly { background: #fffbeb; color: #d97706; border-color: #fef3c7; }
-    .btn-monthly:hover { background: #d97706; color: white; }
 
-    .btn-action span { transition: transform 0.3s; }
-    .btn-action:hover span { transform: translateX(5px); }
+    #search-btn:hover { opacity: 0.9; }
 
-    /* 로딩 애니메이션 보정 */
-    .loading-overlay { padding: 5rem 0; }
-    .spinner { width: 60px; height: 60px; border-width: 5px; border-top-color: var(--btn-bg); }
+    /* 추천 태그 */
+    .urban-tags {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
 
-    @media (max-width: 600px) {
-      h1 { font-size: 2rem; }
-      .search-card { padding: 1.5rem; }
+    .tag-btn {
+      background: transparent;
+      border: 1px solid var(--input-border);
+      color: var(--placeholder-text);
+      padding: 6px 18px;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tag-btn:hover {
+      border-color: var(--urban-blue);
+      color: var(--urban-blue);
+    }
+
+    /* 결과 그리드 */
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2.5rem;
+      padding: 5rem 0;
+      display: none;
+    }
+
+    .analysis-card {
+      background: var(--container-bg);
+      border-radius: 0; /* 건축적인 직각미 */
+      padding: 3rem;
+      border-left: 4px solid var(--urban-blue);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+      transition: all 0.3s;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .analysis-card.show { opacity: 1; transform: translateY(0); }
+    .analysis-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+
+    .card-title { font-size: 1.6rem; font-weight: 900; margin-bottom: 2rem; color: var(--urban-blue); }
+    
+    .btn-action {
+      display: block;
+      padding: 15px 0;
+      text-decoration: none;
+      color: var(--urban-blue);
+      font-weight: 700;
+      border-bottom: 1px solid var(--divider);
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      color: var(--urban-accent);
+      padding-left: 10px;
+    }
+
+    .btn-action span { float: right; font-weight: 300; }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 2.5rem; }
+      .urban-search-bar { border-radius: 20px; flex-direction: column; }
+      #search-btn { border-radius: 12px; margin-top: 10px; }
     }
   </style>
 </head>
 <body>
   <nav class="navbar">
     <div class="nav-container">
-      <a href="/" class="nav-logo">Ravelist Real Estate</a>
+      <a href="/" class="nav-logo">RAVELIST / REAL ESTATE</a>
     </div>
   </nav>
 
-  <div class="container main-content">
+  <div class="container">
     <div class="theme-toggle">
       <button id="theme-btn" aria-label="Toggle theme">🌙</button>
     </div>
 
-    <section id="search-section" class="search-container">
-      <h1>네이버 부동산 퀵 분석</h1>
-      <p class="subtitle">입력하신 지역의 실시간 광고 데이터를 유형별로 즉시 매칭합니다.</p>
+    <header class="hero-section">
+      <h1>Find your space<br>in the city.</h1>
+      <p class="subtitle">네이버 부동산 빅데이터를 기반으로 최적화된 지역별 매물 분석 리포트를 즉시 생성합니다.</p>
       
-      <div class="search-card">
-        <div class="search-input-group">
-          <input type="text" id="region-input" placeholder="동네 이름을 입력하세요 (예: 역삼동)" autofocus>
-          <button id="search-btn">분석 시작</button>
-        </div>
-        <div class="quick-links">
-          <button class="quick-btn" data-query="역삼동">📍 역삼동</button>
-          <button class="quick-btn" data-query="반포동">📍 반포동</button>
-          <button class="quick-btn" data-query="성수동">📍 성수동</button>
-          <button class="quick-btn" data-query="해운대">📍 해운대</button>
-        </div>
+      <div class="urban-search-bar">
+        <input type="text" id="region-input" placeholder="분석할 지역명을 입력하세요" autofocus>
+        <button id="search-btn">ANALYZE</button>
       </div>
-    </section>
+      
+      <div class="urban-tags">
+        <button class="tag-btn" data-query="역삼동">#역삼동</button>
+        <button class="tag-btn" data-query="반포동">#반포동</button>
+        <button class="tag-btn" data-query="성수동">#성수동</button>
+        <button class="tag-btn" data-query="해운대">#해운대</button>
+      </div>
+    </header>
 
-    <div id="loading" class="loading-overlay" style="display: none;">
+    <div id="loading" class="loading-overlay" style="display: none; text-align: center;">
       <div class="spinner"></div>
-      <p style="font-weight: 700; color: var(--btn-bg);">네이버 부동산 빅데이터를 연결하는 중...</p>
+      <p style="font-weight: 500; letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem; margin-top: 2rem;">Connecting to data source...</p>
     </div>
 
     <section id="analysis-results" class="analysis-grid">
-      <!-- 아파트 분석 카드 -->
       <div class="analysis-card" id="card-1">
-        <span class="region-badge" id="res-region-1">지역</span>
-        <span class="card-icon">🏢</span>
-        <div class="card-title">아파트 단지 분석</div>
-        <p class="card-desc">대단지 시세와 브랜드 아파트의 매매/전월세 현황을 정밀 분석합니다.</p>
+        <div class="card-title">APARTMENT</div>
         <div class="action-group">
-          <a href="#" target="_blank" class="btn-action btn-buy" id="apt-buy">매매 실시간 현황 <span>→</span></a>
-          <a href="#" target="_blank" class="btn-action btn-rent" id="apt-rent">전세 실시간 현황 <span>→</span></a>
-          <a href="#" target="_blank" class="btn-action btn-monthly" id="apt-monthly">월세 실시간 현황 <span>→</span></a>
+          <a href="#" target="_blank" class="btn-action" id="apt-buy">Buy (매매) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="apt-rent">Long-term Rent (전세) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="apt-monthly">Monthly (월세) <span>&rarr;</span></a>
         </div>
       </div>
 
-      <!-- 오피스텔 분석 카드 -->
       <div class="analysis-card" id="card-2">
-        <span class="region-badge" id="res-region-2">지역</span>
-        <span class="card-icon">🏨</span>
-        <div class="card-title">오피스텔/원룸</div>
-        <p class="card-desc">역세권 중심의 직주근접 매물과 1인 가구 최적화 매물을 분석합니다.</p>
+        <div class="card-title">OFFICETEL</div>
         <div class="action-group">
-          <a href="#" target="_blank" class="btn-action btn-buy" id="opst-buy">매매 실시간 현황 <span>→</span></a>
-          <a href="#" target="_blank" class="btn-action btn-rent" id="opst-rent">전세 실시간 현황 <span>→</span></a>
-          <a href="#" target="_blank" class="btn-action btn-monthly" id="opst-monthly">월세 실시간 현황 <span>→</span></a>
+          <a href="#" target="_blank" class="btn-action" id="opst-buy">Buy (매매) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="opst-rent">Long-term Rent (전세) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="opst-monthly">Monthly (월세) <span>&rarr;</span></a>
         </div>
       </div>
 
-      <!-- 빌라/주택 분석 카드 -->
       <div class="analysis-card" id="card-3">
-        <span class="region-badge" id="res-region-3">지역</span>
-        <span class="card-icon">🏡</span>
-        <div class="card-title">빌라/다세대</div>
-        <p class="card-desc">실거주 목적의 빌라 및 재개발 가능성 있는 주택 매물을 분석합니다.</p>
+        <div class="card-title">VILLA / HOUSE</div>
         <div class="action-group">
-          <a href="#" target="_blank" class="btn-action btn-buy" id="vl-buy">매매 실시간 현황 <span>→</span></a>
-          <a href="#" target="_blank" class="btn-action btn-rent" id="vl-rent">전세 실시간 현황 <span>→</span></a>
-          <a href="#" target="_blank" class="btn-action btn-monthly" id="vl-monthly">월세 실시간 현황 <span>→</span></a>
+          <a href="#" target="_blank" class="btn-action" id="vl-buy">Buy (매매) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="vl-rent">Long-term Rent (전세) <span>&rarr;</span></a>
+          <a href="#" target="_blank" class="btn-action" id="vl-monthly">Monthly (월세) <span>&rarr;</span></a>
         </div>
       </div>
     </section>
 
-    <hr class="divider">
-
-    <section class="info-section" style="text-align: center;">
-      <article>
-        <h2>Smart Analysis System</h2>
-        <p>Ravelist는 네이버 부동산의 방대한 데이터를 카테고리별로 자동 분류하여, 사용자가 원하는 매물에 도달하는 시간을 80% 이상 단축시킵니다.</p>
-      </article>
-    </section>
+    <footer class="footer">
+      <p style="font-size: 0.75rem; letter-spacing: 2px; opacity: 0.5;">&copy; 2026 RAVELIST REAL ESTATE / ALL RIGHTS RESERVED.</p>
+    </footer>
   </div>
-
-  <footer class="footer">
-    <div class="footer-container">
-      <p>&copy; 2026 Ravelist Real Estate. All rights reserved.</p>
-    </div>
-  </footer>
 
   <script defer src="/main.js"></script>
 </body>
